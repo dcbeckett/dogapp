@@ -70,14 +70,36 @@ def get_all_dogs():
     dogs = cursor.fetchall()
     conn.close()
     
-    # Inject content if we don't have enough variety or randomly
-    if len(dogs) < 8:
-        # Always add content if we have very few photos
-        inject_random_dog()
-        if random.random() < 0.3:  # 30% chance to also add a cat
-            inject_random_cat()
-    elif random.random() < 0.4:  # 40% chance to add something new
-        # Randomly choose what to inject
+    # Ensure we have at least 100 pictures total
+    current_count = len(dogs)
+    min_required = 100
+    
+    if current_count < min_required:
+        # Calculate how many we need to add
+        needed = min_required - current_count
+        print(f"📊 Current photos: {current_count}, need {needed} more to reach minimum {min_required}")
+        
+        # Add the required number of pictures
+        # Mix of mostly dogs (80%) and some cats (20%) for attention testing
+        cats_to_add = max(1, needed // 5)  # At least 1 cat, or ~20% of needed
+        dogs_to_add = needed - cats_to_add
+        
+        print(f"🐕 Adding {dogs_to_add} dogs and 🐱 {cats_to_add} cats")
+        
+        # Add the dogs first
+        for i in range(dogs_to_add):
+            success = inject_random_dog()
+            if not success:
+                print(f"⚠️ Failed to add dog {i+1}/{dogs_to_add}")
+        
+        # Add the cats
+        for i in range(cats_to_add):
+            success = inject_random_cat()
+            if not success:
+                print(f"⚠️ Failed to add cat {i+1}/{cats_to_add}")
+    
+    elif random.random() < 0.3:  # 30% chance to add bonus content when we have enough
+        # Randomly choose what to inject for variety
         roll = random.random()
         if roll < 0.2:  # 20% chance for cat (attention test)
             inject_random_cat()
@@ -93,6 +115,7 @@ def get_all_dogs():
     
     # Shuffle the list for random order
     random.shuffle(dogs)
+    print(f"🎲 Ready to serve {len(dogs)} pictures for voting!")
     return dogs
 
 def add_dog(filename, original_name, is_cat=False):
@@ -107,42 +130,117 @@ def add_dog(filename, original_name, is_cat=False):
 def inject_random_cat():
     """Inject a random cat photo from an online service"""
     try:
-        # Use The Cat API for random cat photos
-        cat_urls = [
-            "https://cataas.com/cat/cute",
-            "https://cataas.com/cat/orange", 
-            "https://cataas.com/cat/fluffy",
-            "https://cataas.com/cat/kitten",
-            "https://cataas.com/cat/sleepy"
+        # Use multiple cat APIs for better reliability
+        cat_apis = [
+            # Direct image URLs from cataas.com
+            {
+                'type': 'direct',
+                'urls': [
+                    "https://cataas.com/cat/cute",
+                    "https://cataas.com/cat/orange", 
+                    "https://cataas.com/cat/fluffy",
+                    "https://cataas.com/cat/kitten",
+                    "https://cataas.com/cat/sleepy",
+                    "https://cataas.com/cat/small",
+                    "https://cataas.com/cat/bengal"
+                ]
+            },
+            # JSON API from thecatapi.com
+            {
+                'type': 'json',
+                'url': "https://api.thecatapi.com/v1/images/search",
+                'key': 'url'
+            }
         ]
         
-        cat_url = random.choice(cat_urls)
-        response = requests.get(cat_url, timeout=10)
-        
-        if response.status_code == 200:
-            # Generate unique filename for cat
-            cat_filename = f"cat_{uuid.uuid4().hex}.jpg"
-            cat_path = os.path.join(app.config['UPLOAD_FOLDER'], cat_filename)
-            
-            # Create upload directory if it doesn't exist
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            
-            # Save cat image
-            with open(cat_path, 'wb') as f:
-                f.write(response.content)
-            
-            # Add to database as a cat
-            cat_names = [
-                "Suspicious Cat 🤔", 
-                "Sneaky Kitty 😼", 
-                "Plot Twist Cat 🐱", 
-                "Not a Dog! 😸",
-                "Attention Test Cat 🙀",
-                "Gotcha Cat 😹",
-                "Meow Imposter 🐾"
-            ]
-            add_dog(cat_filename, random.choice(cat_names), is_cat=True)
-            return True
+        # Try each API approach
+        for api in cat_apis:
+            try:
+                if api['type'] == 'direct':
+                    # Direct image URL approach
+                    cat_url = random.choice(api['urls'])
+                    response = requests.get(cat_url, timeout=15)
+                    
+                    if response.status_code == 200:
+                        # Generate unique filename for cat
+                        cat_filename = f"cat_{uuid.uuid4().hex}.jpg"
+                        cat_path = os.path.join(app.config['UPLOAD_FOLDER'], cat_filename)
+                        
+                        # Create upload directory if it doesn't exist
+                        os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                        
+                        # Save cat image
+                        with open(cat_path, 'wb') as f:
+                            f.write(response.content)
+                        
+                        # Add to database as a cat
+                        cat_names = [
+                            "Suspicious Cat 🤔", 
+                            "Sneaky Kitty 😼", 
+                            "Plot Twist Cat 🐱", 
+                            "Not a Dog! 😸",
+                            "Attention Test Cat 🙀",
+                            "Gotcha Cat 😹",
+                            "Meow Imposter 🐾",
+                            "Feline Infiltrator 🕵️",
+                            "Whiskers Wannabe 😽",
+                            "Test Subject Mittens 🧪"
+                        ]
+                        add_dog(cat_filename, random.choice(cat_names), is_cat=True)
+                        print(f"✅ Injected random cat: {cat_filename}")
+                        return True
+                        
+                elif api['type'] == 'json':
+                    # JSON API approach
+                    response = requests.get(api['url'], timeout=15)
+                    if response.status_code == 200:
+                        data = response.json()
+                        if isinstance(data, list) and len(data) > 0 and api['key'] in data[0]:
+                            image_url = data[0][api['key']]
+                            
+                            # Download the actual image
+                            img_response = requests.get(image_url, timeout=15)
+                            if img_response.status_code == 200:
+                                # Determine file extension
+                                file_ext = 'jpg'
+                                if '.' in image_url:
+                                    file_ext = image_url.split('.')[-1].lower().split('?')[0]
+                                    if file_ext not in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
+                                        file_ext = 'jpg'
+                                
+                                # Generate unique filename for cat
+                                cat_filename = f"cat_{uuid.uuid4().hex}.{file_ext}"
+                                cat_path = os.path.join(app.config['UPLOAD_FOLDER'], cat_filename)
+                                
+                                # Create upload directory if it doesn't exist
+                                os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+                                
+                                # Save cat image
+                                with open(cat_path, 'wb') as f:
+                                    f.write(img_response.content)
+                                
+                                # Add to database as a cat
+                                cat_names = [
+                                    "Suspicious Cat 🤔", 
+                                    "Sneaky Kitty 😼", 
+                                    "Plot Twist Cat 🐱", 
+                                    "Not a Dog! 😸",
+                                    "Attention Test Cat 🙀",
+                                    "Gotcha Cat 😹",
+                                    "Meow Imposter 🐾",
+                                    "Feline Infiltrator 🕵️",
+                                    "Whiskers Wannabe 😽",
+                                    "Test Subject Mittens 🧪"
+                                ]
+                                add_dog(cat_filename, random.choice(cat_names), is_cat=True)
+                                print(f"✅ Injected random cat: {cat_filename}")
+                                return True
+                                
+            except Exception as api_error:
+                print(f"Failed with cat API {api}: {api_error}")
+                continue
+                
+        return False
     except Exception as e:
         print(f"Failed to inject cat: {e}")
         return False
@@ -154,12 +252,13 @@ def inject_random_dog():
         dog_apis = [
             "https://dog.ceo/api/breeds/image/random",  # Returns JSON with message field
             "https://random.dog/woof.json",  # Returns JSON with url field
+            "https://api.thedogapi.com/v1/images/search",  # TheDogAPI format
         ]
         
         # Try different approaches for different APIs
         for api_url in dog_apis:
             try:
-                response = requests.get(api_url, timeout=10)
+                response = requests.get(api_url, timeout=15)
                 if response.status_code == 200:
                     data = response.json()
                     
@@ -168,16 +267,22 @@ def inject_random_dog():
                         image_url = data['message']
                     elif 'url' in data:  # random.dog format
                         image_url = data['url']
+                    elif isinstance(data, list) and len(data) > 0 and 'url' in data[0]:  # thedogapi format
+                        image_url = data[0]['url']
                     else:
                         continue
                     
+                    # Skip if URL contains video formats
+                    if any(ext in image_url.lower() for ext in ['.mp4', '.webm', '.mov', '.avi']):
+                        continue
+                    
                     # Download the actual image
-                    img_response = requests.get(image_url, timeout=10)
+                    img_response = requests.get(image_url, timeout=15)
                     if img_response.status_code == 200:
                         # Determine file extension from URL or default to jpg
                         file_ext = 'jpg'
                         if '.' in image_url:
-                            file_ext = image_url.split('.')[-1].lower()
+                            file_ext = image_url.split('.')[-1].lower().split('?')[0]  # Remove query params
                             if file_ext not in ['jpg', 'jpeg', 'png', 'gif', 'webp']:
                                 file_ext = 'jpg'
                         
@@ -203,7 +308,10 @@ def inject_random_dog():
                             "Code Canine 💻",
                             "Pixel Pup 🎨",
                             "Random Rescue 🎲",
-                            "Virtual Buddy 🎮"
+                            "Virtual Buddy 🎮",
+                            "API Fetched Friend 🚀",
+                            "Cloud Canine ☁️",
+                            "Randomly Selected Rex 🎯"
                         ]
                         add_dog(dog_filename, random.choice(dog_names), is_cat=False)
                         print(f"✅ Injected random dog: {dog_filename}")
