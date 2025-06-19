@@ -1,0 +1,557 @@
+/* Custom dark theme styles */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #6c757d;
+    --success-color: #28a745;
+    --danger-color: #dc3545;
+    --warning-color: #ffc107;
+    --info-color: #17a2b8;
+    --dark-color: #343a40;
+    --light-color: #f8f9fa;
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    min-height: 100vh;
+}
+
+/* Custom card styles */
+.dog-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.dog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 123, 255, 0.3);
+}
+
+.dog-image {
+    transition: transform 0.3s ease;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.dog-card:hover .dog-image {
+    transform: scale(1.05);
+}
+
+/* Vote button animations */
+.vote-btn {
+    transition: all 0.3s ease;
+    border-radius: 25px;
+    position: relative;
+    overflow: hidden;
+}
+
+.vote-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+}
+
+.vote-btn:active {
+    transform: scale(0.98);
+}
+
+/* Upload area styling */
+.upload-area {
+    border: 3px dashed #6c757d;
+    border-radius: 15px;
+    padding: 40px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(45deg, #2d2d2d, #3d3d3d);
+}
+
+.upload-area:hover {
+    border-color: var(--primary-color);
+    background: linear-gradient(45deg, #3d3d3d, #4d4d4d);
+    transform: translateY(-2px);
+}
+
+.upload-area.dragover {
+    border-color: var(--success-color);
+    background: linear-gradient(45deg, #1e3d2f, #2d5a3d);
+}
+
+/* Custom navbar */
+.navbar-brand {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+/* Tip cards */
+.tip-card {
+    transition: transform 0.3s ease;
+    border: 1px solid #495057;
+}
+
+.tip-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--primary-color);
+}
+
+/* Custom badges */
+.badge {
+    border-radius: 15px;
+    font-size: 0.9rem;
+}
+
+/* Loading animations */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+.loading {
+    animation: pulse 1.5s infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #2d2d2d;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .display-4 {
+        font-size: 2rem;
+    }
+    
+    .dog-card {
+        margin-bottom: 1rem;
+    }
+    
+    .upload-area {
+        padding: 20px 10px;
+    }
+}
+
+/* Button hover effects */
+.btn {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Card body flex layout */
+.card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-body .mt-auto {
+    margin-top: auto;
+}
+
+/* Image preview styles */
+#image-preview img {
+    border-radius: 10px;
+    border: 2px solid var(--secondary-color);
+}
+
+/* Alert custom styles */
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+/* Footer styling */
+footer {
+    margin-top: auto;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Swipe functionality styles */
+.swipe-container {
+    max-width: 400px;
+    margin: 0 auto;
+    position: relative;
+    perspective: 1000px;
+}
+
+.swipe-cards {
+    position: relative;
+    height: 600px;
+}
+
+.swipe-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: grab;
+    user-select: none;
+    transform-origin: center bottom;
+    transition: none;
+}
+
+.swipe-card:active {
+    cursor: grabbing;
+}
+
+.swipe-dog-card {
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.3s ease;
+}
+
+.swipe-dog-card:hover {
+    box-shadow: 0 15px 40px rgba(0, 123, 255, 0.3);
+}
+
+.swipe-dog-image {
+    height: 70%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.swipe-card .card-body {
+    height: 30%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Swipe indicators */
+.swipe-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-weight: bold;
+    z-index: 10;
+}
+
+.left-indicator {
+    left: 20px;
+    background: rgba(220, 53, 69, 0.9);
+}
+
+.right-indicator {
+    right: 20px;
+    background: rgba(40, 167, 69, 0.9);
+}
+
+.swipe-indicator i {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.swipe-indicator span {
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+/* Card stacking effect */
+.swipe-card:nth-child(1) {
+    z-index: 5;
+    transform: scale(1) translateY(0);
+}
+
+.swipe-card:nth-child(2) {
+    z-index: 4;
+    transform: scale(0.95) translateY(-10px);
+    opacity: 0.8;
+}
+
+.swipe-card:nth-child(3) {
+    z-index: 3;
+    transform: scale(0.9) translateY(-20px);
+    opacity: 0.6;
+}
+
+.swipe-card:nth-child(n+4) {
+    z-index: 2;
+    transform: scale(0.85) translateY(-30px);
+    opacity: 0.4;
+}
+
+/* Swipe animations */
+.swipe-left {
+    transform: translateX(-100vw) rotate(-30deg);
+    opacity: 0;
+    transition: all 0.6s ease-out;
+}
+
+.swipe-right {
+    transform: translateX(100vw) rotate(30deg);
+    opacity: 0;
+    transition: all 0.6s ease-out;
+}
+
+.swipe-back {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+    transition: all 0.3s ease-out;
+}
+
+/* Desktop action buttons */
+.desktop-actions button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    border: 3px solid;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.desktop-actions button:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+#skip-btn {
+    border-color: var(--danger-color);
+    color: var(--danger-color);
+}
+
+#love-btn {
+    border-color: var(--success-color);
+    color: var(--success-color);
+}
+
+/* Swipe instructions */
+.swipe-instruction {
+    padding: 10px 15px;
+    border-radius: 25px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+}
+
+.swipe-instruction:hover {
+    transform: scale(1.05);
+}
+
+/* No more dogs screen */
+.no-more-dogs {
+    padding: 3rem 1rem;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+    .swipe-container {
+        max-width: 350px;
+    }
+    
+    .swipe-cards {
+        height: 550px;
+    }
+    
+    .swipe-indicator {
+        padding: 10px 15px;
+        font-size: 0.8rem;
+    }
+    
+    .swipe-indicator i {
+        font-size: 1.5rem;
+    }
+    
+    .desktop-actions button {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Prevent text selection during swipe */
+.swipe-card * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Enhanced card shadows based on swipe position */
+.swipe-card.swiping-left .swipe-dog-card {
+    box-shadow: -10px 10px 30px rgba(220, 53, 69, 0.4);
+}
+
+.swipe-card.swiping-right .swipe-dog-card {
+    box-shadow: 10px 10px 30px rgba(40, 167, 69, 0.4);
+}
+
+/* Heart animation for swipe right */
+@keyframes heartFloat {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--random-x, 0px)), calc(-50% + var(--random-y, -100px))) scale(1.5);
+    }
+}
+
+/* Cat animation for when caught */
+@keyframes catFloat {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1) rotate(0deg);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(calc(-50% + var(--random-x, 0px) * 0.5), calc(-50% + var(--random-y, -50px) * 0.5)) scale(1.3) rotate(180deg);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--random-x, 0px)), calc(-50% + var(--random-y, -100px))) scale(0.5) rotate(360deg);
+    }
+}
+
+/* Cat card styling */
+.cat-card {
+    border: 2px solid rgba(255, 193, 7, 0.3) !important;
+    background: linear-gradient(45deg, #343a40, #495057) !important;
+}
+
+/* Cat message modal */
+.cat-message-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.cat-message-content {
+    background: var(--dark-color);
+    border-radius: 20px;
+    padding: 0;
+    max-width: 400px;
+    width: 90%;
+    border: 2px solid var(--warning-color);
+    overflow: hidden;
+    animation: bounceIn 0.5s ease-out;
+}
+
+.cat-message-header {
+    background: var(--warning-color);
+    color: var(--dark-color);
+    padding: 20px;
+    text-align: center;
+}
+
+.cat-message-header h3 {
+    margin: 0;
+    font-weight: bold;
+}
+
+.cat-message-body {
+    padding: 30px 20px;
+    text-align: center;
+    color: var(--light-color);
+}
+
+.cat-icon {
+    font-size: 4rem;
+    margin-bottom: 15px;
+    animation: wiggle 0.5s ease-in-out infinite alternate;
+}
+
+.cat-message-body h4 {
+    color: var(--warning-color);
+    margin-bottom: 15px;
+}
+
+.cat-message-footer {
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes wiggle {
+    0% { transform: rotate(-3deg); }
+    100% { transform: rotate(3deg); }
+}
+
+/* Subtle hints for cats */
+.cat-card .swipe-dog-image {
+    filter: sepia(10%) hue-rotate(25deg);
+}
+
+.cat-card:hover .swipe-dog-image {
+    filter: sepia(20%) hue-rotate(25deg);
+    transition: filter 0.3s ease;
+}
+
+/* Subtle hints for generated dogs */
+.swipe-card[data-dog-filename^="generated_dog_"] .swipe-dog-card {
+    border: 1px solid rgba(23, 162, 184, 0.2) !important;
+    background: linear-gradient(45deg, #343a40, #3d4650) !important;
+}
+
+.swipe-card[data-dog-filename^="generated_dog_"] .swipe-dog-image {
+    filter: brightness(1.05) saturate(1.1);
+}
+
+.swipe-card[data-dog-filename^="generated_dog_"]:hover .swipe-dog-image {
+    filter: brightness(1.1) saturate(1.2);
+    transition: filter 0.3s ease;
+} 

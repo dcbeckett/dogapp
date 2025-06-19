@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Dog - Dog Voting Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-md-10">
+        <div class="card bg-secondary">
+            <div class="card-header">
+                <h2 class="card-title mb-0">
+                    <i class="fas fa-cloud-upload-alt me-2"></i>Upload Your Dog Picture
+                </h2>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" id="upload-form">
+                    <div class="mb-4">
+                        <label for="file" class="form-label">Choose a dog picture</label>
+                        <div class="upload-area" id="upload-area">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                <h5>Drag & Drop your dog picture here</h5>
+                                <p class="text-muted">or click to browse</p>
+                                <input type="file" 
+                                       class="form-control" 
+                                       id="file" 
+                                       name="file" 
+                                       accept="image/*" 
+                                       required
+                                       style="display: none;">
+                            </div>
+                        </div>
+                        <div class="form-text text-muted mt-2">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Supported formats: PNG, JPG, JPEG, GIF, WebP (max 16MB)
+                        </div>
+                    </div>
+                    
+                    <div id="image-preview" class="mb-4" style="display: none;">
+                        <h6>Preview:</h6>
+                        <img id="preview-img" class="img-thumbnail" style="max-height: 200px;">
+                        <div class="mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="clearPreview()">
+                                <i class="fas fa-times me-1"></i>Change Image
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-success btn-lg" id="submit-btn">
+                            <i class="fas fa-upload me-2"></i>Upload Dog Picture
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Back to Gallery
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="mt-4 text-center">
+            <h5>Tips for great dog photos:</h5>
+            <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                    <div class="tip-card bg-dark p-3 rounded">
+                        <i class="fas fa-sun text-warning fa-2x mb-2"></i>
+                        <p class="small mb-0">Good lighting makes photos pop!</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="tip-card bg-dark p-3 rounded">
+                        <i class="fas fa-camera text-info fa-2x mb-2"></i>
+                        <p class="small mb-0">Capture your dog's personality!</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="tip-card bg-dark p-3 rounded">
+                        <i class="fas fa-heart text-danger fa-2x mb-2"></i>
+                        <p class="small mb-0">Every dog is a winner here!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
