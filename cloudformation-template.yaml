@@ -120,7 +120,7 @@ Resources:
         Variables:
           S3_BUCKET_NAME: !Ref S3Bucket
           DYNAMODB_TABLE: !Ref DynamoDBTable
-          AWS_REGION: !Ref AWS::Region
+          REGION: !Ref AWS::Region
       Timeout: 30
 
   # API Gateway REST API

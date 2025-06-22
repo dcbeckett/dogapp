@@ -18,7 +18,7 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 # AWS Configuration
 BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'your-dog-voting-bucket')
 DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', 'dog-voting-table')
-AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+AWS_REGION = os.environ.get('REGION', 'us-east-1')
 
 # Initialize AWS clients
 s3_client = boto3.client('s3')
