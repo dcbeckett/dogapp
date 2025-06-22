@@ -39,9 +39,9 @@ def get_all_dogs():
         response = table.scan()
         dogs = response['Items']
         
-        # Ensure we have at least 100 pictures total
+        # Ensure we have at least 20 pictures total
         current_count = len(dogs)
-        min_required = 100
+        min_required = 20
         
         if current_count < min_required:
             # Calculate how many we need to add
@@ -316,10 +316,22 @@ def vote_for_dog(dog_id):
 @app.route('/')
 def index():
     """Main page showing all dogs"""
-    dogs = get_all_dogs()
-    # Generate S3 URLs for images
-    for dog in dogs:
-        dog['image_url'] = f"https://{BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/uploads/{dog['filename']}"
+    dogs_tuples = get_all_dogs()
+    # Convert tuples to dictionaries with image URLs
+    dogs = []
+    for dog_tuple in dogs_tuples:
+        # Expected format: (id, filename, original_name, votes, upload_date, is_cat, cat_votes)
+        dog_dict = {
+            'id': dog_tuple[0],
+            'filename': dog_tuple[1],
+            'original_name': dog_tuple[2],
+            'votes': dog_tuple[3],
+            'upload_date': dog_tuple[4],
+            'is_cat': dog_tuple[5],
+            'cat_votes': dog_tuple[6],
+            'image_url': f"https://{BUCKET_NAME}.s3.{AWS_REGION}.amazonaws.com/uploads/{dog_tuple[1]}"
+        }
+        dogs.append(dog_dict)
     return render_template('index.html', dogs=dogs)
 
 @app.route('/upload', methods=['GET', 'POST'])
