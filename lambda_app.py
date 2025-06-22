@@ -14,6 +14,7 @@ from botocore.exceptions import ClientError
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+app.config['S3_BUCKET_NAME'] = BUCKET_NAME
 
 # AWS Configuration
 BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'your-dog-voting-bucket')
@@ -78,10 +79,25 @@ def get_all_dogs():
         response = table.scan()
         dogs = response['Items']
         
+        # Convert DynamoDB items to SQLite tuple format for template compatibility
+        # Expected format: (id, filename, original_name, votes, upload_date, is_cat, cat_votes)
+        dogs_tuples = []
+        for dog in dogs:
+            dog_tuple = (
+                dog.get('id', ''),
+                dog.get('filename', ''),
+                dog.get('original_name', ''),
+                int(dog.get('votes', 0)),
+                dog.get('upload_date', ''),
+                bool(dog.get('is_cat', False)),
+                int(dog.get('cat_votes', 0))
+            )
+            dogs_tuples.append(dog_tuple)
+        
         # Shuffle the list for random order
-        random.shuffle(dogs)
-        print(f"🎲 Ready to serve {len(dogs)} pictures for voting!")
-        return dogs
+        random.shuffle(dogs_tuples)
+        print(f"🎲 Ready to serve {len(dogs_tuples)} pictures for voting!")
+        return dogs_tuples
         
     except Exception as e:
         print(f"Error getting dogs: {e}")

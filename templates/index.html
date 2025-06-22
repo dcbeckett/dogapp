@@ -44,9 +44,15 @@
                         <div class="swipe-card" data-dog-id="{{ dog.id or dog[0] }}" data-dog-votes="{{ dog.votes or dog[3] }}" data-is-cat="{{ dog.is_cat or dog[5] }}" data-dog-filename="{{ dog.filename or dog[1] }}">
                             <div class="card bg-secondary border-0 swipe-dog-card {% if dog.is_cat or dog[5] %}cat-card{% endif %}">
                                 <div class="position-relative">
-                                    <img src="{{ dog.image_url if dog.image_url else url_for('static', filename='uploads/' + (dog.filename or dog[1])) }}" 
-                                         class="card-img-top swipe-dog-image" 
-                                         alt="{{ dog.original_name or dog[2] }}">
+                                    {% if 'amazonaws.com' in request.url_root %}
+                                        <img src="https://{{ config.get('S3_BUCKET_NAME', 'dog-voting-app-bucket') }}.s3.amazonaws.com/uploads/{{ dog[1] }}" 
+                                             class="card-img-top swipe-dog-image" 
+                                             alt="{{ dog[2] }}">
+                                    {% else %}
+                                        <img src="{{ url_for('static', filename='uploads/' + dog[1]) }}" 
+                                             class="card-img-top swipe-dog-image" 
+                                             alt="{{ dog[2] }}">
+                                    {% endif %}
                                     
                                     <!-- Cat indicator (subtle) -->
                                     {% if dog[5] %}
