@@ -404,6 +404,12 @@ def api_vote(dog_id):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
 
+# Alternative route for current API Gateway setup
+@app.route('/vote/<dog_id>', methods=['POST'])  
+def vote_route(dog_id):
+    """Alternative vote endpoint that works with current API Gateway"""
+    return api_vote(dog_id)
+
 @app.errorhandler(RequestEntityTooLarge)
 def too_large(e):
     flash('File is too large. Maximum size is 16MB.', 'error')

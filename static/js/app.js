@@ -274,7 +274,7 @@ function handleKeyDown(e) {
 // Voting functionality (now used for swipe right)
 function voteForDog(dogId) {
     console.log('Voting for dog/cat ID:', dogId);
-    fetch(`/api/vote/${dogId}`, {
+    fetch(`vote/${dogId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
