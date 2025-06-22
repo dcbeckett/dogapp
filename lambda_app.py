@@ -10,16 +10,16 @@ from werkzeug.exceptions import RequestEntityTooLarge
 import serverless_wsgi
 from botocore.exceptions import ClientError
 
+# AWS Configuration
+BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'your-dog-voting-bucket')
+DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', 'dog-voting-table')
+AWS_REGION = os.environ.get('REGION', 'us-east-1')
+
 # Initialize Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 app.config['S3_BUCKET_NAME'] = BUCKET_NAME
-
-# AWS Configuration
-BUCKET_NAME = os.environ.get('S3_BUCKET_NAME', 'your-dog-voting-bucket')
-DYNAMODB_TABLE = os.environ.get('DYNAMODB_TABLE', 'dog-voting-table')
-AWS_REGION = os.environ.get('REGION', 'us-east-1')
 
 # Initialize AWS clients
 s3_client = boto3.client('s3')

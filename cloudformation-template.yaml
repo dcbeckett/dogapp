@@ -106,7 +106,7 @@ Resources:
       - DynamoDBTable
     Properties:
       FunctionName: !Ref LambdaFunctionName
-      Runtime: python3.9
+      Runtime: python3.12
       Handler: lambda_app.handler
       Role: !GetAtt LambdaExecutionRole.Arn
       Code:
