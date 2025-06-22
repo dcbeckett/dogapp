@@ -41,12 +41,12 @@
             <div class="swipe-container" id="swipe-container">
                 <div class="swipe-cards" id="swipe-cards">
                     {% for dog in dogs %}
-                        <div class="swipe-card" data-dog-id="{{ dog[0] }}" data-dog-votes="{{ dog[3] }}" data-is-cat="{{ dog[5] }}" data-dog-filename="{{ dog[1] }}">
-                            <div class="card bg-secondary border-0 swipe-dog-card {% if dog[5] %}cat-card{% endif %}">
+                        <div class="swipe-card" data-dog-id="{{ dog.id or dog[0] }}" data-dog-votes="{{ dog.votes or dog[3] }}" data-is-cat="{{ dog.is_cat or dog[5] }}" data-dog-filename="{{ dog.filename or dog[1] }}">
+                            <div class="card bg-secondary border-0 swipe-dog-card {% if dog.is_cat or dog[5] %}cat-card{% endif %}">
                                 <div class="position-relative">
-                                    <img src="{{ url_for('static', filename='uploads/' + dog[1]) }}" 
+                                    <img src="{{ dog.image_url if dog.image_url else url_for('static', filename='uploads/' + (dog.filename or dog[1])) }}" 
                                          class="card-img-top swipe-dog-image" 
-                                         alt="{{ dog[2] }}">
+                                         alt="{{ dog.original_name or dog[2] }}">
                                     
                                     <!-- Cat indicator (subtle) -->
                                     {% if dog[5] %}
