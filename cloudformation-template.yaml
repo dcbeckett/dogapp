@@ -18,6 +18,11 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${BucketName}-${AWS::AccountId}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders: ['*']
