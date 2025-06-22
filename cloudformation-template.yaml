@@ -5,7 +5,7 @@ Parameters:
   BucketName:
     Type: String
     Default: dog-voting-app-bucket
-    Description: Name for the S3 bucket (must be globally unique)
+    Description: Name for the S3 bucket (must anbe globally unique)
   
   LambdaFunctionName:
     Type: String
@@ -28,6 +28,7 @@ Resources:
   # S3 Bucket Policy (separate from bucket to avoid circular dependency)
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
+    DependsOn: S3Bucket
     Properties:
       Bucket: !Ref S3Bucket
       PolicyDocument:
@@ -37,7 +38,7 @@ Resources:
             Effect: Allow
             Principal: '*'
             Action: 's3:GetObject'
-            Resource: !Sub "${S3Bucket}/*"
+            Resource: !Sub "arn:aws:s3:::${S3Bucket}/*"
 
   # DynamoDB Table for storing votes and metadata
   DynamoDBTable:
@@ -56,6 +57,7 @@ Resources:
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      RoleName: !Sub "${LambdaFunctionName}-execution-role"
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -93,6 +95,10 @@ Resources:
   # Lambda Function
   LambdaFunction:
     Type: AWS::Lambda::Function
+    DependsOn:
+      - LambdaExecutionRole
+      - S3Bucket
+      - DynamoDBTable
     Properties:
       FunctionName: !Ref LambdaFunctionName
       Runtime: python3.9
