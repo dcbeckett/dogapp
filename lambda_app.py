@@ -386,4 +386,4 @@ def not_found(e):
     return jsonify({'error': 'Not found'}), 404
 
 # Lambda handler
-handler = Mangum(app) 
+handler = Mangum(app, lifespan="off") 
