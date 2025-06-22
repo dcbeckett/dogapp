@@ -62,8 +62,8 @@ function handleStart(e) {
     e.preventDefault();
     isDragging = true;
     
-    const clientX = e.clientX || e.touches[0].clientX;
-    const clientY = e.clientY || e.touches[0].clientY;
+    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
     
     swipeStartX = clientX;
     swipeStartY = clientY;
@@ -81,8 +81,8 @@ function handleMove(e) {
     
     e.preventDefault();
     
-    const clientX = e.clientX || e.touches[0].clientX;
-    const clientY = e.clientY || e.touches[0].clientY;
+    const clientX = e.clientX || (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+    const clientY = e.clientY || (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
     
     currentX = clientX;
     currentY = clientY;
