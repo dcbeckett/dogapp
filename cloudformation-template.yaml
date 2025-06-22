@@ -5,7 +5,35 @@ Parameters:
   BucketName:
     Type: String
     Default: dog-voting-app-bucket
-    Description: Name for the S3 bucket (must anbe globally unique)
+    Description: Name for the S3 bucket (must anapp.js:277 
+            
+            
+           POST https://dxc81zd25i.execute-api.us-east-1.amazonaws.com/api/vote/efd14817-aa16-4da8-93d6-931f683b04ae 403 (Forbidden)
+voteForDog @ app.js:277
+swipeRight @ app.js:191
+handleEnd @ app.js:111Understand this error
+app.js:285 Vote response data: {message: 'Forbidden'}
+app.js:276 Voting for dog/cat ID: 541eac00-abfd-4f4c-bc06-554897f4c4a4
+app.js:277 
+            
+            
+           POST https://dxc81zd25i.execute-api.us-east-1.amazonaws.com/api/vote/541eac00-abfd-4f4c-bc06-554897f4c4a4 403 (Forbidden)
+voteForDog @ app.js:277
+swipeRight @ app.js:191
+handleEnd @ app.js:111Understand this error
+app.js:285 Vote response data: {message: 'Forbidden'}
+10app.js:84 Uncaught TypeError: Cannot read properties of undefined (reading '0')
+    at HTMLDocument.handleMove (app.js:84:43)
+handleMove @ app.js:84Understand this error
+app.js:276 Voting for dog/cat ID: 34cd7bb2-a24e-4df5-9915-0cdd389af457
+app.js:277 
+            
+            
+           POST https://dxc81zd25i.execute-api.us-east-1.amazonaws.com/api/vote/34cd7bb2-a24e-4df5-9915-0cdd389af457 403 (Forbidden)
+voteForDog @ app.js:277
+swipeRight @ app.js:191
+handleEnd @ app.js:111Understand this error
+app.js:285 Vote response data: {message: 'Forbidden'}be globally unique)
   
   LambdaFunctionName:
     Type: String
@@ -136,6 +164,22 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGateway
       ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: '{proxy+}'
+      
+  # API Gateway Resource for /api path
+  ApiGatewayApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: 'api'
+      
+  # API Gateway Resource for /api/{proxy+}
+  ApiGatewayApiProxyResource:  
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ParentId: !Ref ApiGatewayApiResource
       PathPart: '{proxy+}'
 
   # API Gateway Method

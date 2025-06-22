@@ -273,6 +273,7 @@ function handleKeyDown(e) {
 
 // Voting functionality (now used for swipe right)
 function voteForDog(dogId) {
+    console.log('Voting for dog/cat ID:', dogId);
     fetch(`/api/vote/${dogId}`, {
         method: 'POST',
         headers: {
@@ -281,6 +282,7 @@ function voteForDog(dogId) {
     })
     .then(response => response.json())
     .then(data => {
+        console.log('Vote response data:', data);
         if (data.success) {
             // Update vote count in current card
             const card = getCurrentCard();
@@ -293,12 +295,15 @@ function voteForDog(dogId) {
             
             // Handle cat vs dog differently
             if (data.is_cat) {
+                console.log('Cat detected! Showing cat popup with message:', data.message);
+                console.log('Cat name:', data.cat_name);
                 // Show cat caught animation and message
                 createCatCaughtAnimation();
                 setTimeout(() => {
                     showCatMessage(data.message, data.cat_name);
                 }, 500);
             } else {
+                console.log('Dog detected! Showing heart animation');
                 // Show normal heart animation for dogs
                 createHeartAnimation();
             }
@@ -373,6 +378,7 @@ function createCatCaughtAnimation() {
 }
 
 function showCatMessage(message, catName) {
+    console.log('showCatMessage called with:', { message, catName });
     // Create modal-like message
     const modal = document.createElement('div');
     modal.className = 'cat-message-modal';
@@ -397,7 +403,9 @@ function showCatMessage(message, catName) {
         </div>
     `;
     
+    console.log('Adding cat modal to document body');
     document.body.appendChild(modal);
+    console.log('Cat modal added, checking if it exists:', document.body.contains(modal));
     
     // Auto-close after 8 seconds
     setTimeout(() => {

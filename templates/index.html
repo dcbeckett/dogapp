@@ -41,27 +41,27 @@
             <div class="swipe-container" id="swipe-container">
                 <div class="swipe-cards" id="swipe-cards">
                     {% for dog in dogs %}
-                        <div class="swipe-card" data-dog-id="{{ dog.id or dog[0] }}" data-dog-votes="{{ dog.votes or dog[3] }}" data-is-cat="{{ dog.is_cat or dog[5] }}" data-dog-filename="{{ dog.filename or dog[1] }}">
-                            <div class="card bg-secondary border-0 swipe-dog-card {% if dog.is_cat or dog[5] %}cat-card{% endif %}">
+                        <div class="swipe-card" data-dog-id="{{ dog.id }}" data-dog-votes="{{ dog.votes }}" data-is-cat="{{ dog.is_cat }}" data-dog-filename="{{ dog.filename }}">
+                            <div class="card bg-secondary border-0 swipe-dog-card {% if dog.is_cat %}cat-card{% endif %}">
                                 <div class="position-relative">
-                                    {% if 'amazonaws.com' in request.url_root %}
-                                        <img src="https://{{ config.get('S3_BUCKET_NAME', 'dog-voting-app-bucket') }}.s3.amazonaws.com/uploads/{{ dog[1] }}" 
+                                    {% if dog.image_url %}
+                                        <img src="{{ dog.image_url }}" 
                                              class="card-img-top swipe-dog-image" 
-                                             alt="{{ dog[2] }}">
+                                             alt="{{ dog.original_name }}">
                                     {% else %}
-                                        <img src="{{ url_for('static', filename='uploads/' + dog[1]) }}" 
+                                        <img src="{{ url_for('static', filename='uploads/' + dog.filename) }}" 
                                              class="card-img-top swipe-dog-image" 
-                                             alt="{{ dog[2] }}">
+                                             alt="{{ dog.original_name }}">
                                     {% endif %}
                                     
                                     <!-- Cat indicator (subtle) -->
-                                    {% if dog[5] %}
+                                    {% if dog.is_cat %}
                                         <div class="position-absolute top-0 start-0 m-3">
                                             <span class="badge bg-warning text-dark fs-6" style="opacity: 0.7;">
                                                 <i class="fas fa-cat me-1"></i>
                                             </span>
                                         </div>
-                                    {% elif dog[1].startswith('generated_dog_') %}
+                                    {% elif dog.filename.startswith('generated_dog_') %}
                                         <!-- Generated dog indicator -->
                                         <div class="position-absolute top-0 start-0 m-3">
                                             <span class="badge bg-info text-dark fs-6" style="opacity: 0.6;">
@@ -72,10 +72,10 @@
                                     
                                     <div class="position-absolute top-0 end-0 m-3">
                                         <span class="badge bg-primary fs-5">
-                                            {% if dog[5] %}
-                                                <i class="fas fa-paw me-1"></i><span class="vote-count">{{ dog[6] }}</span>
+                                            {% if dog.is_cat %}
+                                                <i class="fas fa-paw me-1"></i><span class="vote-count">{{ dog.cat_votes }}</span>
                                             {% else %}
-                                                <i class="fas fa-heart me-1"></i><span class="vote-count">{{ dog[3] }}</span>
+                                                <i class="fas fa-heart me-1"></i><span class="vote-count">{{ dog.votes }}</span>
                                             {% endif %}
                                         </span>
                                     </div>
@@ -86,7 +86,7 @@
                                         <span>SKIP</span>
                                     </div>
                                     <div class="swipe-indicator right-indicator">
-                                        {% if dog[5] %}
+                                        {% if dog.is_cat %}
                                             <i class="fas fa-cat"></i>
                                             <span>MEOW?</span>
                                         {% else %}
@@ -96,12 +96,12 @@
                                     </div>
                                 </div>
                                 <div class="card-body text-center">
-                                    <h4 class="card-title mb-2">{{ dog[2] }}</h4>
+                                    <h4 class="card-title mb-2">{{ dog.original_name }}</h4>
                                     <p class="card-text text-muted">
                                         <i class="fas fa-calendar me-1"></i>
-                                        Uploaded: {{ dog[4][:10] }}
+                                        Uploaded: {{ dog.upload_date[:10] }}
                                     </p>
-                                    {% if dog[5] %}
+                                    {% if dog.is_cat %}
                                         <p class="text-warning small">
                                             <i class="fas fa-exclamation-triangle me-1"></i>
                                             Something seems different about this one...
