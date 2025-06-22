@@ -18,14 +18,6 @@ Resources:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${BucketName}-${AWS::AccountId}"
-      PublicReadPolicy:
-        Version: '2012-10-17'
-        Statement:
-          - Sid: PublicReadGetObject
-            Effect: Allow
-            Principal: '*'
-            Action: 's3:GetObject'
-            Resource: !Sub "${S3Bucket}/*"
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders: ['*']
@@ -33,7 +25,7 @@ Resources:
             AllowedOrigins: ['*']
             MaxAge: 3000
 
-  # S3 Bucket Policy for public read access
+  # S3 Bucket Policy (separate from bucket to avoid circular dependency)
   S3BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
@@ -47,11 +39,11 @@ Resources:
             Action: 's3:GetObject'
             Resource: !Sub "${S3Bucket}/*"
 
-  # DynamoDB Table
+  # DynamoDB Table for storing votes and metadata
   DynamoDBTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: dog-voting-table
+      TableName: !Sub "${LambdaFunctionName}-table"
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: id
@@ -60,7 +52,7 @@ Resources:
         - AttributeName: id
           KeyType: HASH
 
-  # Lambda Execution Role
+  # IAM Role for Lambda function
   LambdaExecutionRole:
     Type: AWS::IAM::Role
     Properties:
@@ -74,19 +66,6 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
       Policies:
-        - PolicyName: DynamoDBAccess
-          PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Effect: Allow
-                Action:
-                  - dynamodb:GetItem
-                  - dynamodb:PutItem
-                  - dynamodb:UpdateItem
-                  - dynamodb:DeleteItem
-                  - dynamodb:Scan
-                  - dynamodb:Query
-                Resource: !GetAtt DynamoDBTable.Arn
         - PolicyName: S3Access
           PolicyDocument:
             Version: '2012-10-17'
@@ -97,6 +76,19 @@ Resources:
                   - s3:PutObject
                   - s3:DeleteObject
                 Resource: !Sub "${S3Bucket}/*"
+        - PolicyName: DynamoDBAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:PutItem
+                  - dynamodb:UpdateItem
+                  - dynamodb:DeleteItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource: !GetAtt DynamoDBTable.Arn
 
   # Lambda Function
   LambdaFunction:
@@ -105,44 +97,50 @@ Resources:
       FunctionName: !Ref LambdaFunctionName
       Runtime: python3.9
       Handler: lambda_app.handler
+      Role: !GetAtt LambdaExecutionRole.Arn
       Code:
         ZipFile: |
-          # Placeholder code - will be replaced during deployment
           def handler(event, context):
               return {
                   'statusCode': 200,
-                  'body': 'Hello from Lambda!'
+                  'body': 'Placeholder - will be updated by deploy script'
               }
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Timeout: 30
-      MemorySize: 512
       Environment:
         Variables:
           S3_BUCKET_NAME: !Ref S3Bucket
           DYNAMODB_TABLE: !Ref DynamoDBTable
           AWS_REGION: !Ref AWS::Region
-          SECRET_KEY: !Sub "${AWS::StackName}-secret-key"
+      Timeout: 30
 
-  # API Gateway
+  # API Gateway REST API
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
       Name: !Sub "${LambdaFunctionName}-api"
-      Description: API Gateway for Dog Voting App
-      BinaryMediaTypes:
-        - 'image/*'
-        - 'multipart/form-data'
+      Description: API for Dog Voting App
 
-  # API Gateway Lambda Permission
-  ApiGatewayLambdaPermission:
-    Type: AWS::Lambda::Permission
+  # API Gateway Resource (catch-all proxy)
+  ApiGatewayResource:
+    Type: AWS::ApiGateway::Resource
     Properties:
-      FunctionName: !Ref LambdaFunction
-      Action: lambda:InvokeFunction
-      Principal: apigateway.amazonaws.com
-      SourceArn: !Sub "${ApiGateway}/*/ANY/*"
+      RestApiId: !Ref ApiGateway
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: '{proxy+}'
 
-  # API Gateway Root Resource
+  # API Gateway Method
+  ApiGatewayMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref ApiGateway
+      ResourceId: !Ref ApiGatewayResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
+
+  # API Gateway Method for root
   ApiGatewayRootMethod:
     Type: AWS::ApiGateway::Method
     Properties:
@@ -155,58 +153,46 @@ Resources:
         IntegrationHttpMethod: POST
         Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
 
-  # API Gateway Proxy Resource
-  ApiGatewayProxyResource:
-    Type: AWS::ApiGateway::Resource
-    Properties:
-      RestApiId: !Ref ApiGateway
-      ParentId: !GetAtt ApiGateway.RootResourceId
-      PathPart: '{proxy+}'
-
-  # API Gateway Proxy Method
-  ApiGatewayProxyMethod:
-    Type: AWS::ApiGateway::Method
-    Properties:
-      RestApiId: !Ref ApiGateway
-      ResourceId: !Ref ApiGatewayProxyResource
-      HttpMethod: ANY
-      AuthorizationType: NONE
-      Integration:
-        Type: AWS_PROXY
-        IntegrationHttpMethod: POST
-        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations"
-
   # API Gateway Deployment
   ApiGatewayDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn:
+      - ApiGatewayMethod
       - ApiGatewayRootMethod
-      - ApiGatewayProxyMethod
     Properties:
       RestApiId: !Ref ApiGateway
       StageName: prod
 
+  # Lambda Permission for API Gateway
+  LambdaApiGatewayPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub "${ApiGateway}/*/*"
+
 Outputs:
   WebsiteURL:
     Description: URL of the Dog Voting App
-    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod"
+    Value: !Sub "https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod/"
     Export:
       Name: !Sub "${AWS::StackName}-WebsiteURL"
 
   S3BucketName:
-    Description: Name of the S3 bucket
+    Description: Name of the S3 bucket for storing images
     Value: !Ref S3Bucket
     Export:
-      Name: !Sub "${AWS::StackName}-S3Bucket"
+      Name: !Sub "${AWS::StackName}-S3BucketName"
 
   DynamoDBTableName:
     Description: Name of the DynamoDB table
     Value: !Ref DynamoDBTable
     Export:
-      Name: !Sub "${AWS::StackName}-DynamoDBTable"
+      Name: !Sub "${AWS::StackName}-DynamoDBTableName"
 
   LambdaFunctionName:
     Description: Name of the Lambda function
     Value: !Ref LambdaFunction
     Export:
-      Name: !Sub "${AWS::StackName}-LambdaFunction" 
+      Name: !Sub "${AWS::StackName}-LambdaFunctionName" 
