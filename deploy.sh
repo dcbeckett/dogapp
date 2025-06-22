@@ -56,7 +56,7 @@ aws cloudformation deploy \
     --template-file cloudformation-template.yaml \
     --stack-name $STACK_NAME \
     --parameter-overrides BucketName=$BUCKET_PREFIX \
-    --capabilities CAPABILITY_IAM \
+    --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM \
     --region $REGION
 
 echo "✅ CloudFormation stack deployed!"
