@@ -7,7 +7,7 @@ import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 from werkzeug.exceptions import RequestEntityTooLarge
-from mangum import Mangum
+import serverless_wsgi
 from botocore.exceptions import ClientError
 
 # Initialize Flask app
@@ -386,4 +386,5 @@ def not_found(e):
     return jsonify({'error': 'Not found'}), 404
 
 # Lambda handler
-handler = Mangum(app, lifespan="off") 
+def handler(event, context):
+    return serverless_wsgi.handle_request(app, event, context) 
